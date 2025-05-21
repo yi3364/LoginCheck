@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Java 环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 构建插件
+        run: mvn clean package
+
+      - name: 读取更新日志
+        id: changelog
+        run: |
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+          awk '/^## /{if (p) exit; p=1; next} p' CHANGELOG.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: 上传 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/*.jar
+            README.md
+            CHANGELOG.md
+            src/main/resources/config.yml
+          body: ${{ env.RELEASE_BODY }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
