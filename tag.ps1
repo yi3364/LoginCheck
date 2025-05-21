@@ -46,4 +46,4 @@ git tag -a "v$version" -m "v$version`n$body"
 
 # 7. 推送代码和 tag
 git push
-git push origin "v$version"
+git push origin v$version
