@@ -1,0 +1,48 @@
+# LoginCheck 插件配置文件
+# 用于控制玩家首次加入时的权限分组、身份显示、消息文本等
+
+# === 功能开关 ===
+enable-commands:
+  premium: true     # 是否为正版玩家执行命令
+  cracked: true     # 是否为盗版玩家执行命令
+
+broadcast-enabled: true   # 是否启用进服提示广播
+
+# === 权限分组命令 ===
+commands:
+  premium: "lp user %player% parent add premium"   # 正版玩家命令
+  cracked: "lp user %player% parent add cracked"   # 盗版玩家命令
+
+# === 身份显示文本 ===
+status-text:
+  premium: "正版"     # 正版玩家身份显示文字
+  cracked: "盗版"     # 盗版玩家身份显示文字
+
+# === 消息相关文本配置 ===
+messages:
+  player-not-found: "§c未找到该玩家记录。"   # 查询玩家信息时未找到记录
+  reload-success: "§a配置文件已重新加载！"   # 配置文件重载成功提示
+
+  player-info: |                        # 查询玩家信息时发送的格式化信息
+    §e玩家: §f%player%
+    §eUUID: §f%uuid%
+    §e状态: §f%status%
+  # %player% - 玩家名称
+  # %uuid%   - 玩家UUID
+  # %status% - 身份（如“正版”或“盗版”）
+
+  player-info-formatted: |              # 查询玩家信息时发送的格式化信息（带格式化状态）
+    §e玩家: §f%player%
+    §eUUID: §f%uuid%
+    §e状态: §f%status_formatted%
+  # %player%           - 玩家名称
+  # %uuid%             - 玩家UUID
+  # %status_formatted% - 格式化后的身份（如“正版”或“盗版”）
+
+  broadcast-premium: "§a[LoginCheck] 玩家 %player% 上线，身份：正版"
+  broadcast-cracked: "§c[LoginCheck] 玩家 %player% 上线，身份：盗版"
+# 说明：
+# - 所有消息均可使用 § 颜色代码
+# - 建议如需换行请保持缩进一致，避免 YAML 解析错误
+# 是否启用身份广播（仅对拥有 logincheck.broadcast 权限的玩家）
+

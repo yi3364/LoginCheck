@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.afeng.logincheck</groupId>
+  <artifactId>LoginCheck</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>LoginCheck</name>
+  <description>登录检测插件</description>
+
+  <properties>
+    <!-- Minecraft 1.21.4 要求 Java 17 -->
+    <java.version>17</java.version>
+    <minecraft.version>1.21.4</minecraft.version>
+    <!-- 编码设置，防止中文乱码 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- Paper API 依赖，编译时提供，不会打包进最终插件 -->
+    <dependency>
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>${minecraft.version}-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- PlaceholderAPI 依赖，编译时提供，不会打包进最终插件 -->
+    <dependency>
+      <groupId>me.clip</groupId>
+      <artifactId>placeholderapi</artifactId>
+      <version>2.11.6</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <!-- PaperMC 官方仓库 -->
+    <repository>
+      <id>papermc</id>
+      <url>https://repo.papermc.io/repository/maven-public/</url>
+    </repository>
+    <!-- PlaceholderAPI 仓库（如有需要可添加） -->
+    <!--
+    <repository>
+      <id>placeholderapi</id>
+      <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+    </repository>
+    -->
+  </repositories>
+
+  <build>
+    <plugins>
+      <!-- 编译插件，指定 Java 版本 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+
+      <!-- 打包插件，生成可用的 jar 文件 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <!-- mainClass 对于插件不是必须，可移除 -->
+              <!-- <mainClass>com.afeng.logincheck.LoginCheck</mainClass> -->
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -1,0 +1,20 @@
+name: LoginCheck
+main: com.afeng.logincheck.LoginCheck
+version: 1.0.0
+api-version: 1.21
+authors: [Liek_Girls]
+description: 自动识别正版/盗版身份并执行权限分配和广播。
+
+commands:
+  logincheck:
+    description: 登录检查器命令
+    usage: /logincheck <check|reload>
+    aliases: [lc]
+
+permissions:
+  logincheck.check:
+    description: 使用 /logincheck check 查询玩家身份
+    default: op
+  logincheck.reload:
+    description: 重载 LoginCheck 配置
+    default: op
