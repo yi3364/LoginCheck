@@ -31,7 +31,6 @@ public final class LoginCheck extends JavaPlugin {
 
         // 注册监听器
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-        getServer().getPluginManager().registerEvents(new BotJoinListener(this), this);
 
         // 注册命令和补全
         LoginCheckCommand commandExecutor = new LoginCheckCommand(this);

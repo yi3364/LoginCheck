@@ -1,4 +1,3 @@
-com\afeng\logincheck\BotJoinListener.class
 com\afeng\logincheck\LoginCheckCommand.class
 com\afeng\logincheck\LoginCheck.class
 com\afeng\logincheck\PlayerJoinListener.class

@@ -44,8 +44,5 @@ banner:
   - "§b╚══════╝ ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝"
   - "§a[LoginCheck] 插件已启用！"
 
-# === leaves服务端假人相关 ===
-bot:
-  group: "tool"         # 假人分配的权限组
-  data-file: "bots.yml" # 假人数据记录文件名
+
 

@@ -7,7 +7,7 @@
   <!-- 项目基础信息 -->
   <groupId>com.afeng.logincheck</groupId>
   <artifactId>LoginCheck</artifactId>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <packaging>jar</packaging>
 
   <name>LoginCheck</name>

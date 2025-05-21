@@ -3,15 +3,13 @@ package com.afeng.logincheck;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * /logincheck 或 /lc 命令处理器 支持 /lc、/lc check <玩家名>、/lc check <页码>、/lc bots [关键词] [页码]、/lc reload
+ * /logincheck 或 /lc 命令处理器 支持 /lc、/lc check <玩家名>、/lc check <页码>、/lc reload
  */
 public class LoginCheckCommand implements CommandExecutor, TabCompleter {
 
@@ -61,127 +59,6 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
         FileConfiguration data = plugin.getPlayersData();
         FileConfiguration config = plugin.getConfig();
         String pluginName = plugin.getDescription().getName();
-
-        // === /lc bots [关键词] [页码] ===
-        if (args.length >= 1 && args[0].equalsIgnoreCase("bots")) {
-            // 读取 bots.yml
-            String botsFileName = config.getString("bot.data-file", "bots.yml");
-            File botsFile = new File(plugin.getDataFolder(), botsFileName);
-            FileConfiguration botsData = YamlConfiguration.loadConfiguration(botsFile);
-
-            if (!botsData.isConfigurationSection("bots")) {
-                sender.sendMessage("§e暂无假人记录。");
-                return true;
-            }
-
-            // 解析参数：支持 /lc bots [关键词] [页码]
-            String filter = null;
-            int page = 1;
-            for (int i = 1; i < args.length; i++) {
-                if (args[i].matches("\\d+")) {
-                    page = Integer.parseInt(args[i]);
-                } else {
-                    filter = args[i].toLowerCase();
-                }
-            }
-
-            // 收集并筛选假人
-            List<Map<String, String>> botList = new ArrayList<>();
-            for (String uuid : botsData.getConfigurationSection("bots").getKeys(false)) {
-                String name = botsData.getString("bots." + uuid + ".name", "未知");
-                String summoner = botsData.getString("bots." + uuid + ".summoner", "未知");
-                String time = botsData.getString("bots." + uuid + ".summon-time", "未知");
-                if (filter != null && !(name.toLowerCase().contains(filter)
-                        || summoner.toLowerCase().contains(filter))) {
-                    continue;
-                }
-                Map<String, String> map = new HashMap<>();
-                map.put("uuid", uuid);
-                map.put("name", name);
-                map.put("summoner", summoner);
-                map.put("time", time);
-                botList.add(map);
-            }
-
-            if (botList.isEmpty()) {
-                sender.sendMessage("§e没有符合条件的假人记录。");
-                return true;
-            }
-
-            // 分页
-            int PAGE_SIZE = 8;
-            int total = botList.size();
-            int totalPages = (int) Math.ceil(total * 1.0 / PAGE_SIZE);
-            if (page < 1)
-                page = 1;
-            if (page > totalPages)
-                page = totalPages;
-            int from = (page - 1) * PAGE_SIZE;
-            int to = Math.min(from + PAGE_SIZE, total);
-
-            // 构造 JSON 假人列表，召唤人可点击跳转
-            StringBuilder json = new StringBuilder("[");
-            for (int i = from; i < to; i++) {
-                Map<String, String> bot = botList.get(i);
-                if (i > from)
-                    json.append(",");
-                // 假人名（点击复制）
-                json.append("{\"text\":\"§6").append(bot.get("name")).append("§r\",")
-                        .append("\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"点击复制假人名\"},")
-                        .append("\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"")
-                        .append(bot.get("name")).append("\"}},");
-                // UUID
-                json.append("{\"text\":\" §7(UUID: ").append(bot.get("uuid"))
-                        .append(") §f召唤人: \"},");
-                // 召唤人（点击跳转到 /lc check 召唤人）
-                json.append("{\"text\":\"§b").append(bot.get("summoner")).append("§r\",").append(
-                        "\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"点击查询召唤人信息\"},")
-                        .append("\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check ")
-                        .append(bot.get("summoner")).append("\"}},");
-                // 时间
-                json.append("{\"text\":\" §7时间: §e").append(bot.get("time")).append("\"}");
-                if (i != to - 1)
-                    json.append(",");
-            }
-            json.append("]");
-
-            sender.sendMessage("§a假人列表（共" + total + "个，页码 " + page + "/" + totalPages + "）：");
-            if (sender instanceof Player) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        "tellraw " + sender.getName() + " " + json.toString());
-                // 翻页按钮
-                int prevPage = page > 1 ? page - 1 : 1;
-                int nextPage = page < totalPages ? page + 1 : totalPages;
-                String filterArg = (filter != null) ? filter + " " : "";
-
-                StringBuilder nav = new StringBuilder("[");
-                if (page > 1) {
-                    nav.append(
-                            "{\"text\":\"§b[上一页] \",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc bots ")
-                            .append(filterArg).append(prevPage).append("\"}}");
-                }
-                nav.append("{\"text\":\"§7[第 ").append(page).append("/").append(totalPages)
-                        .append(" 页]\"}");
-                if (page < totalPages) {
-                    if (page > 1)
-                        nav.append(",");
-                    nav.append(
-                            "{\"text\":\" §b[下一页]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc bots ")
-                            .append(filterArg).append(nextPage).append("\"}}");
-                }
-                nav.append("]");
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        "tellraw " + sender.getName() + " " + nav.toString());
-            } else {
-                // 控制台只输出文本
-                for (int i = from; i < to; i++) {
-                    Map<String, String> bot = botList.get(i);
-                    sender.sendMessage("§6" + bot.get("name") + " §7(UUID: " + bot.get("uuid")
-                            + ") §f召唤人: §b" + bot.get("summoner") + " §7时间: §e" + bot.get("time"));
-                }
-            }
-            return true;
-        }
 
         // === /lc 或 /logincheck，默认查询自己 ===
         if (args.length == 0) {
@@ -250,52 +127,45 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
                 int to = Math.min(from + PAGE_SIZE, total);
 
                 // 构造 JSON 按钮
-                StringBuilder json = new StringBuilder("[");
+                List<String> jsonList = new ArrayList<>();
                 for (int i = from; i < to; i++) {
                     String name = playerNames.get(i);
                     String uuid = plugin.getNameToUUIDCache().get(name.toLowerCase());
                     String status = data.getString("players." + uuid + ".status", "未知");
-                    if (i > from)
-                        json.append(",");
-                    json.append("{\"text\":\"§b").append(name)
-                            .append("\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"身份: ")
-                            .append(status).append("\\nUUID: ").append(uuid)
-                            .append("\"},\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check ")
-                            .append(name).append("\"}}");
+                    jsonList.add("{\"text\":\"§b" + name
+                            + "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"身份: "
+                            + status + "\\nUUID: " + uuid
+                            + "\"},\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check "
+                            + name + "\"}}");
                     // 分隔符
                     if (i < to - 1)
-                        json.append(",{\"text\":\"§7 | \"}");
+                        jsonList.add("{\"text\":\"§7 | \"}");
                 }
-                if (json.length() > 1)
-                    json.setLength(json.length() - 18); // 移除最后一个分隔符
-                json.append("]");
+                String json = "[" + String.join(",", jsonList) + "]";
 
                 sender.sendMessage("§a点击下方玩家名可快速查询（第 " + page + "/" + totalPages + " 页）：");
                 if (sender instanceof Player) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            "tellraw " + sender.getName() + " " + json.toString());
+                            "tellraw " + sender.getName() + " " + json);
                     // 翻页按钮
                     if (totalPages > 1) {
                         int prevPage = page > 1 ? page - 1 : 1;
                         int nextPage = page < totalPages ? page + 1 : totalPages;
-                        StringBuilder nav = new StringBuilder("[");
+                        List<String> navList = new ArrayList<>();
                         if (page > 1) {
-                            nav.append(
-                                    "{\"text\":\"§b[上一页] \",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check ")
-                                    .append(prevPage).append("\"}}");
+                            navList.add(
+                                    "{\"text\":\"§b[上一页] \",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check "
+                                            + prevPage + "\"}}");
                         }
-                        nav.append("{\"text\":\"§7[第 ").append(page).append("/").append(totalPages)
-                                .append(" 页]\"}");
+                        navList.add("{\"text\":\"§7[第 " + page + "/" + totalPages + " 页]\"}");
                         if (page < totalPages) {
-                            if (page > 1)
-                                nav.append(",");
-                            nav.append(
-                                    "{\"text\":\" §b[下一页]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check ")
-                                    .append(nextPage).append("\"}}");
+                            navList.add(
+                                    "{\"text\":\" §b[下一页]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check "
+                                            + nextPage + "\"}}");
                         }
-                        nav.append("]");
+                        String nav = "[" + String.join(",", navList) + "]";
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                "tellraw " + sender.getName() + " " + nav.toString());
+                                "tellraw " + sender.getName() + " " + nav);
                     }
                 } else {
                     for (int i = from; i < to; i++) {
@@ -323,31 +193,28 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
 
                 if (sender instanceof Player) {
                     // tellraw JSON
-                    StringBuilder tellraw = new StringBuilder("[");
+                    List<String> tellrawList = new ArrayList<>();
                     // 玩家名，hover显示身份和UUID
-                    tellraw.append("{\"text\":\"§e玩家: §f").append(name)
-                            .append("\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"身份: ")
-                            .append(status).append("\\nUUID: ").append(uuid).append("\"}},,");
+                    tellrawList.add("{\"text\":\"§e玩家: §f" + name
+                            + "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"身份: "
+                            + status + "\\nUUID: " + uuid + "\"}}");
                     // 身份
-                    tellraw.append("{\"text\":\"\\n§e身份: §f").append(status).append("\"},,");
+                    tellrawList.add("{\"text\":\"\\n§e身份: §f" + status + "\"}");
                     // UUID，可复制
-                    tellraw.append("{\"text\":\"\\n§eUUID: §f").append(uuid).append(
-                            "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"点击复制UUID\"},")
-                            .append("\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"")
-                            .append(uuid).append("\"}},,");
+                    tellrawList.add("{\"text\":\"\\n§eUUID: §f" + uuid
+                            + "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"点击复制UUID\"},"
+                            + "\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"" + uuid
+                            + "\"}}");
                     // 曾用名（有才显示）
                     if (!names.isEmpty()) {
-                        tellraw.append("{\"text\":\"\\n§e曾用名: §f").append(namesStr).append("\"}");
-                    } else {
-                        // 移除最后一个逗号
-                        if (tellraw.charAt(tellraw.length() - 1) == ',')
-                            tellraw.deleteCharAt(tellraw.length() - 1);
+                        tellrawList.add("{\"text\":\"\\n§e曾用名: §f" + namesStr + "\"}");
                     }
-                    tellraw.append("]");
+                    String tellrawJson = "[" + String.join(",", tellrawList) + "]";
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            "tellraw " + sender.getName() + " " + tellraw.toString());
+                            "tellraw " + sender.getName() + " " + tellrawJson);
                 } else {
-                    sender.sendMessage(Pattern.compile("\\r?\\n").split(msg));
+                    // 控制台输出纯文本
+                    sender.sendMessage(msg.split("\\n"));
                 }
                 return true;
             }
@@ -357,7 +224,7 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
         }
 
         // 其它参数不正确时提示用法
-        sender.sendMessage("§c用法: /lc [check <玩家名>|reload|bots]");
+        sender.sendMessage("§c用法: /lc [check <玩家名>|reload]");
         return true;
     }
 
@@ -366,7 +233,7 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
             String[] args) {
         // /lc <tab>
         if (args.length == 1) {
-            return Arrays.asList("check", "reload", "bots");
+            return Arrays.asList("check", "reload");
         }
         // /lc check <tab>
         if (args.length == 2 && args[0].equalsIgnoreCase("check")) {
@@ -376,7 +243,6 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
             }
             return names;
         }
-        // /lc bots <tab> 可补全关键词或页码（可选扩展）
         return Collections.emptyList();
     }
 }
