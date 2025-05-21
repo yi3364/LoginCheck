@@ -2,6 +2,8 @@
 
 LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件，支持自动识别正版/离线玩家身份、分配权限组、进服消息广播、假人权限自动分配与记录、玩家/假人信息查询等功能。
 
+---
+
 ## 功能特性
 
 - **自动识别正版/离线玩家**，首次进服自动分配不同权限组
@@ -11,32 +13,41 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
 - **/lc check** 分页查询所有玩家，点击玩家名可跳转详细信息
 - **/lc bots** 分页查询所有假人，支持关键词筛选，召唤人可点击跳转
 - **监听 leaves 服务端 /bot create 命令，假人自动分配权限组并记录召唤人**
+- **支持假人历史所有召唤人及时间的记录**
 - **配置灵活，支持自定义命令、消息、分组、数据文件名等**
+
+---
 
 ## 指令说明
 
-| 指令                | 权限                | 说明                                 |
-|---------------------|---------------------|--------------------------------------|
-| /lc                 | -                   | 查询自己身份信息                     |
-| /lc check           | logincheck.check    | 分页列出所有玩家，点击名可跳转       |
-| /lc check <玩家名>  | logincheck.check    | 查询指定玩家详细信息                 |
-| /lc check <页码>    | logincheck.check    | 分页浏览玩家列表                     |
-| /lc bots            | -                   | 分页列出所有假人，支持筛选与跳转     |
-| /lc bots <关键词>   | -                   | 筛选假人名或召唤人                   |
-| /lc bots <关键词> <页码> | -              | 筛选并分页浏览假人                   |
-| /lc reload          | logincheck.reload   | 重载插件配置                         |
+| 指令                        | 权限                | 说明                                 |
+|-----------------------------|---------------------|--------------------------------------|
+| /lc                         | -                   | 查询自己身份信息                     |
+| /lc check                   | logincheck.check    | 分页列出所有玩家，每行一个玩家       |
+| /lc check <玩家名>          | logincheck.check    | 查询指定玩家详细信息                 |
+| /lc check <页码>            | logincheck.check    | 分页浏览玩家列表                     |
+| /lc bots                    | -                   | 分页列出所有假人，每行一个假人       |
+| /lc bots <关键词>           | -                   | 筛选假人名或召唤人                   |
+| /lc bots <关键词> <页码>    | -                   | 筛选并分页浏览假人                   |
+| /lc reload                  | logincheck.reload   | 重载插件配置                         |
+
+---
 
 ## 假人支持
 
 - 监听 `/bot create <假人名>` 命令，自动记录召唤人
 - 假人加入时自动分配 `tool`（可配置）权限组
-- 假人信息（名、UUID、召唤人、时间）记录于 `bots.yml`
+- 假人信息（名、UUID、历史召唤人及时间）记录于 `bots.yml`
 - `/lc bots` 可查询所有假人，召唤人可点击跳转到其玩家信息
+
+---
 
 ## 配置说明
 
 - `config.yml` 支持自定义分组、命令、消息、假人数据文件名等
 - `plugin.yml` 已声明所有命令与权限
+
+---
 
 ## 构建与安装
 
@@ -44,8 +55,10 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
    ```shell
    mvn clean package
    ```
-2. 将 `target/LoginCheck-1.0.3.jar` 放入服务器 `plugins` 目录
+2. 将 `target/LoginCheck-x.x.x.jar` 放入服务器 `plugins` 目录
 3. 启动服务器，自动生成配置文件
+
+---
 
 ## 兼容性
 

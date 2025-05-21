@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,36 +73,65 @@ public class BotJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         String name = player.getName();
-        if (!botSummonerMap.containsKey(name)) return; // 不是刚刚召唤的假人
+        if (!botSummonerMap.containsKey(name))
+            return;
 
-        String summoner = botSummonerMap.remove(name); // 取出并移除
+        String summoner = botSummonerMap.remove(name);
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowStr = sdf.format(new Date(now));
 
-        // 分配可配置权限组
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + name + " parent add " + botGroup);
+        // 分配权限组
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                "lp user " + name + " parent add " + botGroup);
 
-        // 记录到 bots.yml
         String path = "bots." + uuid;
         botsData.set(path + ".name", name);
-        botsData.set(path + ".uuid", uuid.toString());
+
+        // 追加历史召唤人
+        List<?> rawList = botsData.getList(path + ".summoners");
+        List<Map<String, Object>> summoners = new java.util.ArrayList<>();
+        if (rawList != null) {
+            for (Object obj : rawList) {
+                if (obj instanceof Map) {
+                    // 进一步检查Map的key类型
+                    Map<?, ?> map = (Map<?, ?>) obj;
+                    boolean valid = true;
+                    for (Object key : map.keySet()) {
+                        if (!(key instanceof String)) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> safeMap = (Map<String, Object>) map;
+                        summoners.add(safeMap);
+                    }
+                }
+            }
+        }
+        Map<String, Object> record = new java.util.HashMap<>();
+        record.put("summoner", summoner);
+        record.put("time", nowStr);
+        summoners.add(record);
+        botsData.set(path + ".summoners", summoners);
+
+        // 兼容旧字段
         botsData.set(path + ".summoner", summoner);
         botsData.set(path + ".summon-time", nowStr);
-        saveBotsData();
 
-        plugin.getLogger().info("已为假人 " + name + " 分配 " + botGroup + " 权限组，并记录召唤人: " + summoner);
-    }
-
-    /**
-     * 保存 bots.yml
-     */
-    private void saveBotsData() {
         try {
             botsData.save(botsFile);
         } catch (IOException e) {
             plugin.getLogger().severe("无法保存 " + botsFileName + "！");
         }
+
+        plugin.getLogger().info("已为假人 " + name + " 分配 " + botGroup + " 权限组，并记录召唤人: " + summoner);
+    }
+
+    public FileConfiguration getBotsData() {
+        return botsData;
     }
 }

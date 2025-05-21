@@ -60,15 +60,20 @@ public final class LoginCheck extends JavaPlugin {
      */
     public void loadPlayersData() {
         playersFile = new File(getDataFolder(), "players.yml");
+        boolean firstCreate = false;
         if (!playersFile.exists()) {
             try {
                 playersFile.createNewFile();
-                // 添加注释头
-                YamlConfiguration temp = new YamlConfiguration();
-                temp.options().header("玩家数据文件，请勿手动编辑！\n每个玩家以UUID为主键，包含name/status/首次登录/最近登录等信息。");
-                temp.save(playersFile);
+                firstCreate = true;
             } catch (IOException e) {
                 getLogger().severe("无法创建 players.yml：" + e.getMessage());
+            }
+        }
+        if (firstCreate) {
+            try (java.io.FileWriter fw = new java.io.FileWriter(playersFile)) {
+                fw.write("# 玩家数据文件，请勿手动编辑！\n# 每个玩家以UUID为主键，包含name/status/首次登录/最近登录等信息。\n\n");
+            } catch (IOException e) {
+                getLogger().severe("无法写入 players.yml 注释：" + e.getMessage());
             }
         }
         playersData = YamlConfiguration.loadConfiguration(playersFile);

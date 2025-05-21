@@ -28,10 +28,9 @@ public class PlayerJoinListener implements Listener {
     /**
      * 占位符统一替换工具方法
      */
-    private String replacePlaceholders(String msg, String player, String uuid, String status, String pluginName) {
-        return msg.replace("%player%", player)
-                .replace("%uuid%", uuid)
-                .replace("%status%", status)
+    private String replacePlaceholders(String msg, String player, String uuid, String status,
+            String pluginName) {
+        return msg.replace("%player%", player).replace("%uuid%", uuid).replace("%status%", status)
                 .replace("%plugin%", pluginName);
     }
 
@@ -81,8 +80,8 @@ public class PlayerJoinListener implements Listener {
                 try {
                     // 以UUID为主key存储，玩家名、uuid、status、首次登录、最近登录
                     playersData.set(path + ".name", name);
-                    playersData.set(path + ".uuid", uuid.toString());
-                    String statusKey = finalIsPremium ? "status-text.premium" : "status-text.cracked";
+                    String statusKey =
+                            finalIsPremium ? "status-text.premium" : "status-text.cracked";
                     String statusText = config.getString(statusKey, finalIsPremium ? "正版" : "离线");
                     playersData.set(path + ".status", statusText);
                     playersData.set(path + ".last-login", nowStr);
@@ -101,7 +100,11 @@ public class PlayerJoinListener implements Listener {
                     }
                     if (!exists) {
                         names.add(name);
+                    }
+                    if (names.size() > 1) { // 有曾用名才写入
                         playersData.set(path + ".names", names);
+                    } else {
+                        playersData.set(path + ".names", null);
                     }
 
                     plugin.savePlayersData();
@@ -111,9 +114,10 @@ public class PlayerJoinListener implements Listener {
                     if (config.getBoolean("broadcast-enabled", true)) {
                         String broadcastMsgKey = finalIsPremium ? "messages.broadcast-premium"
                                 : "messages.broadcast-cracked";
-                        String msg = config.getString(broadcastMsgKey, "玩家 %player% 上线，身份：%status%");
-                        msg = msg.replace("%player%", name).replace("%status%", statusText)
-                                .replace("%plugin%", pluginName);
+                        String msg =
+                                config.getString(broadcastMsgKey, "玩家 %player% 上线，身份：%status%");
+                        msg = replacePlaceholders(msg, name, uuid.toString(), statusText,
+                                pluginName);
                         Bukkit.broadcastMessage(msg);
                     }
 
@@ -125,8 +129,8 @@ public class PlayerJoinListener implements Listener {
                                 true)) {
                             String command = config.getString(cmdKey, null);
                             if (command != null && !command.isEmpty()) {
-                                command = command.replace("%player%", name).replace("%status%",
-                                        statusText);
+                                command = replacePlaceholders(command, name, uuid.toString(),
+                                        statusText, pluginName);
                                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                             }
                         }

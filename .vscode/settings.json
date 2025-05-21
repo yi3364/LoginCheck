@@ -14,5 +14,6 @@
         "**/.settings": true,
         "**/target": true,
         "**/bin": true
-    }
+    },
+    "yaml.schemaStore.enable": false
 }

@@ -1,6 +1,6 @@
 name: LoginCheck
 main: com.afeng.logincheck.LoginCheck
-version: 1.0
+version: 1.0.5
 api-version: 1.21
 authors: [Liek_Girls]
 description: 自动识别正版/离线身份并执行权限分配和广播。
