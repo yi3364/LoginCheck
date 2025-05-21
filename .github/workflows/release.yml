@@ -4,7 +4,10 @@ on:
   push:
     tags:
       - "v*"
-      
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,9 +37,6 @@ jobs:
         with:
           files: |
             target/*.jar
-            README.md
-            CHANGELOG.md
-            src/main/resources/config.yml
           body: ${{ env.RELEASE_BODY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
