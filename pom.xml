@@ -4,13 +4,15 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- 项目基础信息 -->
   <groupId>com.afeng.logincheck</groupId>
   <artifactId>LoginCheck</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>jar</packaging>
 
   <name>LoginCheck</name>
-  <description>登录检测插件</description>
+  <description>登录检查与假人权限分配插件</description>
+  <url>https://github.com/yi3364/LoginCheck</url>
 
   <properties>
     <!-- Minecraft 1.21.4 要求 Java 17 -->
@@ -28,6 +30,22 @@
       <version>${minecraft.version}-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Spigot API 依赖 -->
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.20.4-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- LuckPerms 权限插件API（如有需要） -->
+    <!--
+    <dependency>
+      <groupId>net.luckperms</groupId>
+      <artifactId>api</artifactId>
+      <version>5.4</version>
+      <scope>provided</scope>
+    </dependency>
+    -->
   </dependencies>
 
   <repositories>

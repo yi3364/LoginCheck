@@ -28,9 +28,10 @@ public class PlayerJoinListener implements Listener {
     /**
      * 占位符统一替换工具方法
      */
-    private String replacePlaceholders(String msg, String player, String uuid, String status,
-            String pluginName) {
-        return msg.replace("%player%", player).replace("%uuid%", uuid).replace("%status%", status)
+    private String replacePlaceholders(String msg, String player, String uuid, String status, String pluginName) {
+        return msg.replace("%player%", player)
+                .replace("%uuid%", uuid)
+                .replace("%status%", status)
                 .replace("%plugin%", pluginName);
     }
 
@@ -81,8 +82,7 @@ public class PlayerJoinListener implements Listener {
                     // 以UUID为主key存储，玩家名、uuid、status、首次登录、最近登录
                     playersData.set(path + ".name", name);
                     playersData.set(path + ".uuid", uuid.toString());
-                    String statusKey =
-                            finalIsPremium ? "status-text.premium" : "status-text.cracked";
+                    String statusKey = finalIsPremium ? "status-text.premium" : "status-text.cracked";
                     String statusText = config.getString(statusKey, finalIsPremium ? "正版" : "离线");
                     playersData.set(path + ".status", statusText);
                     playersData.set(path + ".last-login", nowStr);
@@ -90,21 +90,28 @@ public class PlayerJoinListener implements Listener {
                         playersData.set(path + ".first-login", nowStr);
                     }
 
-                    // 曾用名处理
+                    // 曾用名处理（忽略大小写，避免重复）
                     List<String> names = playersData.getStringList(path + ".names");
-                    if (!names.contains(name)) {
+                    boolean exists = false;
+                    for (String oldName : names) {
+                        if (oldName.equalsIgnoreCase(name)) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
                         names.add(name);
                         playersData.set(path + ".names", names);
                     }
 
                     plugin.savePlayersData();
+                    plugin.refreshNameToUUIDCache(); // 保存后刷新缓存
 
                     // 广播消息
                     if (config.getBoolean("broadcast-enabled", true)) {
                         String broadcastMsgKey = finalIsPremium ? "messages.broadcast-premium"
                                 : "messages.broadcast-cracked";
-                        String msg =
-                                config.getString(broadcastMsgKey, "玩家 %player% 上线，身份：%status%");
+                        String msg = config.getString(broadcastMsgKey, "玩家 %player% 上线，身份：%status%");
                         msg = msg.replace("%player%", name).replace("%status%", statusText)
                                 .replace("%plugin%", pluginName);
                         Bukkit.broadcastMessage(msg);
