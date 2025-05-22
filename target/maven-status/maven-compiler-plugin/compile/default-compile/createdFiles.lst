@@ -1,3 +1,5 @@
-com\afeng\logincheck\LoginCheckCommand.class
 com\afeng\logincheck\LoginCheck.class
+com\afeng\logincheck\PlaceholderUtils.class
+com\afeng\logincheck\CommandUtils.class
+com\afeng\logincheck\LoginCheckCommand.class
 com\afeng\logincheck\PlayerJoinListener.class

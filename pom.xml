@@ -7,7 +7,7 @@
   <!-- 项目基础信息 -->
   <groupId>com.afeng.logincheck</groupId>
   <artifactId>LoginCheck</artifactId>
-  <version>1.0.7</version>
+  <version>1.1.0</version>
   <packaging>jar</packaging>
 
   <name>LoginCheck</name>
@@ -74,6 +74,9 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
+          <compilerArgs>
+            <arg>-Xlint:-options</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
 

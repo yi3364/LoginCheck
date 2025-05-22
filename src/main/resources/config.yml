@@ -1,6 +1,8 @@
 # LoginCheck 插件配置文件
 # 用于控制玩家首次加入时的权限分组、身份显示、消息文本等
 
+lang: zh_CN # 支持 zh_CN 或 en
+
 # === 功能开关 ===
 enable-commands:
   premium: true # 是否为正版玩家执行命令
@@ -8,41 +10,9 @@ enable-commands:
 
 broadcast-enabled: true # 是否启用进服提示广播
 
-# === 身份显示文本 ===
-status-text:
-  premium: "§b 正版 " # 正版玩家身份显示文字
-  cracked: "§7 LittleSkin皮肤站 " # 离线玩家身份显示文字
-
-# === 消息相关文本配置 ===
-messages:
-  player-info: | # 查询玩家信息时发送的格式化信息
-    §e玩家: §6%player%
-    §e身份: %status%
-    §eUUID: §f%uuid%
-    §e曾用名: §f%names%
-
-  reload-success: "§a配置文件已重新加载！" # 配置文件重载成功提示
-  player-not-found: "§c未找到该玩家记录。" # 查询玩家信息时未找到记录
-
-  broadcast-premium: "§a玩家 §6%player% §a使用%status%§a登入服务器..."
-  broadcast-cracked: "§a玩家 §6%player% §a使用%status%§a登入服务器..."
-
 # === 权限分组命令 ===
 commands:
   premium: "lp user %player% promote logincheck" # 正版玩家命令
   cracked: 'tellraw %player% {"text":"你正以非正版的方式游玩！","color":"red","bold":true,"hoverEvent":{"action":"show_text","contents":"由于使用非正版账号，部分功能可能无法使用。让我们一起支持正版，建立良好的版权意识！"}} ' # 离线玩家命令
 #双引号 "：支持转义字符（如 \n、\t），可以在字符串中插入特殊字符。
 #单引号 '：内容会被原样读取，不支持转义字符，适合包含特殊字符但不需要转义的场景。
-
-# === 其他配置 ===
-banner:
-  - "§b██╗      ██████╗  ██████╗ ██╗███╗   ██╗"
-  - "§b██║     ██╔═══██╗██╔════╝ ██║████╗  ██║"
-  - "§b██║     ██║   ██║██║  ███╗██║██╔██╗ ██║"
-  - "§b██║     ██║   ██║██║   ██║██║██║╚██╗██║"
-  - "§b███████╗╚██████╔╝╚██████╔╝██║██║ ╚████║"
-  - "§b╚══════╝ ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝"
-  - "§a[LoginCheck] 插件已启用！"
-
-
-

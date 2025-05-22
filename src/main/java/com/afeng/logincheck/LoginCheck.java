@@ -1,5 +1,6 @@
 package com.afeng.logincheck;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,12 +23,18 @@ public final class LoginCheck extends JavaPlugin {
     // 玩家名到UUID的缓存（小写名 -> uuid字符串）
     private final Map<String, String> nameToUUID = new ConcurrentHashMap<>();
 
+    private FileConfiguration lang;
+
+    private long lastSaveTime = 0;
+    private static final long SAVE_INTERVAL = 5 * 60 * 1000; // 5分钟
+
     @Override
     public void onEnable() {
         instance = this;
 
         saveDefaultConfig();
         loadPlayersData();
+        loadLang(); // 优先加载语言
 
         // 注册监听器
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
@@ -40,13 +47,13 @@ public final class LoginCheck extends JavaPlugin {
         this.getCommand("lc").setTabCompleter(commandExecutor);
 
         // 输出可配置的 banner
-        FileConfiguration config = getConfig();
-        if (config.isList("banner")) {
-            for (String line : config.getStringList("banner")) {
+        FileConfiguration lang = getLang();
+        if (lang.isList("banner")) {
+            for (String line : lang.getStringList("banner")) {
                 getLogger().info(line);
             }
         } else {
-            getLogger().info("登录检查器插件已启用！");
+            getLogger().info(lang.getString("plugin-enabled", "登录检查器插件已启用！"));
         }
     }
 
@@ -91,6 +98,13 @@ public final class LoginCheck extends JavaPlugin {
     }
 
     /**
+     * 异步保存 players.yml
+     */
+    public void savePlayersDataAsync() {
+        Bukkit.getScheduler().runTaskAsynchronously(this, this::savePlayersData);
+    }
+
+    /**
      * 刷新玩家名到UUID的缓存
      */
     public void refreshNameToUUIDCache() {
@@ -118,5 +132,42 @@ public final class LoginCheck extends JavaPlugin {
      */
     public FileConfiguration loadYaml(File file) {
         return YamlConfiguration.loadConfiguration(file);
+    }
+
+    /**
+     * 加载语言文件，支持多语言
+     */
+    public void loadLang() {
+        FileConfiguration config = getConfig();
+        String langCode = config.getString("lang", "zh_CN").toLowerCase();
+        String langFileName;
+        switch (langCode) {
+            case "en":
+            case "en_us":
+                langFileName = "messages_en.yml";
+                break;
+            case "zh":
+            case "zh_cn":
+            default:
+                langFileName = "messages_zh.yml";
+                break;
+        }
+        File langFile = new File(getDataFolder(), langFileName);
+        if (!langFile.exists()) {
+            saveResource(langFileName, false);
+        }
+        lang = YamlConfiguration.loadConfiguration(langFile);
+    }
+
+    public FileConfiguration getLang() {
+        return lang;
+    }
+
+    public void trySavePlayersData() {
+        long now = System.currentTimeMillis();
+        if (now - lastSaveTime > SAVE_INTERVAL) {
+            savePlayersData();
+            lastSaveTime = now;
+        }
     }
 }

@@ -4,13 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
-/**
- * /logincheck 或 /lc 命令处理器 支持 /lc、/lc check <玩家名>、/lc check <页码>、/lc reload
- */
 public class LoginCheckCommand implements CommandExecutor, TabCompleter {
 
     private final LoginCheck plugin;
@@ -19,229 +17,207 @@ public class LoginCheckCommand implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
 
-    /**
-     * 占位符替换工具方法
-     */
-    private String replacePlaceholders(String msg, String player, String uuid, String status,
-            String pluginName) {
-        return msg.replace("%player%", player).replace("%uuid%", uuid).replace("%status%", status)
-                .replace("%plugin%", pluginName);
-    }
+    private static final String SECTION_PLAYERS = "players";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_STATUS = "status";
+    private static final String FIELD_NAMES = "names";
 
     /**
-     * 通过玩家名或曾用名查找UUID（优先用缓存，其次遍历 names 列表）
+     * 根据玩家名查找UUID
      */
-    private String getUUIDByName(FileConfiguration playersData, String name) {
-        // 先查缓存（当前名）
-        String uuid = plugin.getNameToUUIDCache().get(name.toLowerCase());
+    private @Nullable String getUUIDByName(@NotNull FileConfiguration playersData,
+            @Nullable String name) {
+        String uuid = plugin.getNameToUUIDCache().get(name == null ? "" : name.toLowerCase());
         if (uuid != null)
             return uuid;
-        // 遍历所有玩家的 names 列表
-        if (!playersData.isConfigurationSection("players"))
+        if (playersData == null || !playersData.isConfigurationSection(SECTION_PLAYERS))
             return null;
-        for (String key : playersData.getConfigurationSection("players").getKeys(false)) {
-            // 先查主名
-            String storedName = playersData.getString("players." + key + ".name", "");
+        for (String key : playersData.getConfigurationSection(SECTION_PLAYERS).getKeys(false)) {
+            String storedName =
+                    playersData.getString(SECTION_PLAYERS + "." + key + "." + FIELD_NAME, "");
             if (storedName.equalsIgnoreCase(name))
                 return key;
-            // 再查曾用名
-            List<String> names = playersData.getStringList("players." + key + ".names");
-            for (String oldName : names) {
-                if (oldName.equalsIgnoreCase(name))
-                    return key;
+            List<String> names =
+                    playersData.getStringList(SECTION_PLAYERS + "." + key + "." + FIELD_NAMES);
+            if (names != null) {
+                for (String oldName : names) {
+                    if (oldName.equalsIgnoreCase(name))
+                        return key;
+                }
             }
         }
         return null;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String label, @NotNull String[] args) {
         FileConfiguration data = plugin.getPlayersData();
-        FileConfiguration config = plugin.getConfig();
-        String pluginName = plugin.getDescription().getName();
+        FileConfiguration lang = plugin.getLang();
+        String pluginName = plugin.getName();
 
-        // === /lc 或 /logincheck，默认查询自己 ===
         if (args.length == 0) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("§c控制台请使用 /lc check <玩家名>");
-                return true;
-            }
-            Player player = (Player) sender;
-            String uuid = player.getUniqueId().toString();
-            if (!data.contains("players." + uuid)) {
-                sender.sendMessage(config.getString("messages.player-not-found", "§c未找到该玩家记录。"));
-                return true;
-            }
-            String name = data.getString("players." + uuid + ".name", "未知");
-            String status = data.getString("players." + uuid + ".status", "未知");
-            String msg = config.getString("messages.player-info",
-                    "§e玩家: §f%player%\n§eUUID: §f%uuid%\n§e状态: §f%status%");
-            msg = replacePlaceholders(msg, name, uuid, status, pluginName);
-            sender.sendMessage(Pattern.compile("\\r?\\n").split(msg));
+            sendUsageMain(sender, lang);
             return true;
         }
-
-        // === /lc reload ===
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            if (!sender.hasPermission("logincheck.reload")) {
-                sender.sendMessage("§c你没有权限执行此操作。");
-                return true;
-            }
-            plugin.reloadConfig();
-            plugin.loadPlayersData();
-            sender.sendMessage(config.getString("messages.reload-success", "§a配置文件已重新加载！")
-                    .replace("%plugin%", pluginName));
+            handleReload(sender, lang);
             return true;
         }
-
-        // === /lc check <玩家名> 或 /lc check <页码> 或 /lc check ===
-        if (args.length >= 1 && args[0].equalsIgnoreCase("check")) {
-            // 分页玩家列表
+        if (args[0].equalsIgnoreCase("check")) {
             if (args.length == 1 || (args.length == 2 && args[1].matches("\\d+"))) {
-                if (!data.isConfigurationSection("players")) {
-                    sender.sendMessage("§e暂无玩家记录。");
-                    return true;
-                }
-                List<String> playerNames = new ArrayList<>();
-                for (String uuid : data.getConfigurationSection("players").getKeys(false)) {
-                    String name = data.getString("players." + uuid + ".name", uuid);
-                    playerNames.add(name);
-                }
-                if (playerNames.isEmpty()) {
-                    sender.sendMessage("§e暂无玩家记录。");
-                    return true;
-                }
-                // 分页
-                int PAGE_SIZE = 10;
-                int page = 1;
-                if (args.length == 2 && args[1].matches("\\d+")) {
-                    page = Integer.parseInt(args[1]);
-                }
-                int total = playerNames.size();
-                int totalPages = (int) Math.ceil(total * 1.0 / PAGE_SIZE);
-                if (page < 1)
-                    page = 1;
-                if (page > totalPages)
-                    page = totalPages;
-                int from = (page - 1) * PAGE_SIZE;
-                int to = Math.min(from + PAGE_SIZE, total);
-
-                // 构造 JSON 按钮
-                List<String> jsonList = new ArrayList<>();
-                for (int i = from; i < to; i++) {
-                    String name = playerNames.get(i);
-                    String uuid = plugin.getNameToUUIDCache().get(name.toLowerCase());
-                    String status = data.getString("players." + uuid + ".status", "未知");
-                    jsonList.add("{\"text\":\"§b" + name
-                            + "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"身份: "
-                            + status + "\\nUUID: " + uuid
-                            + "\"},\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check "
-                            + name + "\"}}");
-                    // 分隔符
-                    if (i < to - 1)
-                        jsonList.add("{\"text\":\"§7 | \"}");
-                }
-                String json = "[" + String.join(",", jsonList) + "]";
-
-                sender.sendMessage("§a点击下方玩家名可快速查询（第 " + page + "/" + totalPages + " 页）：");
-                if (sender instanceof Player) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            "tellraw " + sender.getName() + " " + json);
-                    // 翻页按钮
-                    if (totalPages > 1) {
-                        int prevPage = page > 1 ? page - 1 : 1;
-                        int nextPage = page < totalPages ? page + 1 : totalPages;
-                        List<String> navList = new ArrayList<>();
-                        if (page > 1) {
-                            navList.add(
-                                    "{\"text\":\"§b[上一页] \",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check "
-                                            + prevPage + "\"}}");
-                        }
-                        navList.add("{\"text\":\"§7[第 " + page + "/" + totalPages + " 页]\"}");
-                        if (page < totalPages) {
-                            navList.add(
-                                    "{\"text\":\" §b[下一页]\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/lc check "
-                                            + nextPage + "\"}}");
-                        }
-                        String nav = "[" + String.join(",", navList) + "]";
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                "tellraw " + sender.getName() + " " + nav);
-                    }
-                } else {
-                    for (int i = from; i < to; i++) {
-                        sender.sendMessage(playerNames.get(i));
-                    }
-                }
-                return true;
+                handleCheckPage(sender, args, data, lang, pluginName);
+            } else if (args.length == 2) {
+                handleCheckPlayer(sender, args[1], data, lang, pluginName);
+            } else {
+                sendUsageCheck(sender, lang);
             }
-            // /lc check <玩家名>
-            if (args.length == 2) {
-                String name = args[1];
-                String uuid = getUUIDByName(data, name);
-                if (uuid == null) {
-                    sender.sendMessage(
-                            config.getString("messages.player-not-found", "§c未找到该玩家记录。"));
-                    return true;
-                }
-                String status = data.getString("players." + uuid + ".status", "未知");
-                List<String> names = data.getStringList("players." + uuid + ".names");
-                String namesStr = names.isEmpty() ? "无" : String.join(", ", names);
-                String msg = config.getString("messages.player-info",
-                        "§e玩家: §f%player%\n§eUUID: §f%uuid%\n§e状态: §f%status%\n§e曾用名: §f%names%");
-                msg = replacePlaceholders(msg, name, uuid, status, pluginName).replace("%names%",
-                        namesStr);
-
-                if (sender instanceof Player) {
-                    // tellraw JSON
-                    List<String> tellrawList = new ArrayList<>();
-                    // 玩家名，hover显示身份和UUID
-                    tellrawList.add("{\"text\":\"§e玩家: §f" + name
-                            + "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"身份: "
-                            + status + "\\nUUID: " + uuid + "\"}}");
-                    // 身份
-                    tellrawList.add("{\"text\":\"\\n§e身份: §f" + status + "\"}");
-                    // UUID，可复制
-                    tellrawList.add("{\"text\":\"\\n§eUUID: §f" + uuid
-                            + "\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"点击复制UUID\"},"
-                            + "\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"" + uuid
-                            + "\"}}");
-                    // 曾用名（有才显示）
-                    if (!names.isEmpty()) {
-                        tellrawList.add("{\"text\":\"\\n§e曾用名: §f" + namesStr + "\"}");
-                    }
-                    String tellrawJson = "[" + String.join(",", tellrawList) + "]";
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            "tellraw " + sender.getName() + " " + tellrawJson);
-                } else {
-                    // 控制台输出纯文本
-                    sender.sendMessage(msg.split("\\n"));
-                }
-                return true;
-            }
-            // 参数不正确时提示用法
-            sender.sendMessage("§c用法: /lc check [玩家名|页码]");
             return true;
         }
-
-        // 其它参数不正确时提示用法
-        sender.sendMessage("§c用法: /lc [check <玩家名>|reload]");
+        sendUsageMain2(sender, lang);
         return true;
     }
 
+    private void sendUsageMain(@NotNull CommandSender sender, @Nullable FileConfiguration lang) {
+        sender.sendMessage(
+                lang != null ? lang.getString("usage-main", "§e用法: /logincheck <check|reload>")
+                        : "§e用法: /logincheck <check|reload>");
+    }
+
+    private void sendUsageMain2(@NotNull CommandSender sender, @Nullable FileConfiguration lang) {
+        sender.sendMessage(
+                lang != null ? lang.getString("usage-main2", "§c用法: /lc [check <玩家名>|reload]")
+                        : "§c用法: /lc [check <玩家名>|reload]");
+    }
+
+    private void sendUsageCheck(@NotNull CommandSender sender, @Nullable FileConfiguration lang) {
+        sender.sendMessage(lang != null ? lang.getString("usage-check", "§c用法: /lc check [玩家名|页码]")
+                : "§c用法: /lc check [玩家名|页码]");
+    }
+
+    private void handleReload(@NotNull CommandSender sender, @Nullable FileConfiguration lang) {
+        if (!sender.hasPermission("logincheck.reload")) {
+            sender.sendMessage(lang != null ? lang.getString("no-permission", "§c你没有权限执行此操作。")
+                    : "§c你没有权限执行此操作。");
+            return;
+        }
+        plugin.reloadConfig();
+        plugin.loadPlayersData();
+        plugin.loadLang();
+        sender.sendMessage(PlaceholderUtils.replacePlaceholders(
+                lang != null ? lang.getString("reload-success", "§a配置文件已重新加载！") : "§a配置文件已重新加载！",
+                null, null, null, plugin.getName()));
+    }
+
+    /**
+     * 处理分页查询
+     */
+    private void handleCheckPage(@NotNull CommandSender sender, @NotNull String[] args,
+            @NotNull FileConfiguration data, @Nullable FileConfiguration lang,
+            @NotNull String pluginName) {
+        if (!data.isConfigurationSection(SECTION_PLAYERS)) {
+            sender.sendMessage(
+                    lang != null ? lang.getString("no-player-record", "§e暂无玩家记录。") : "§e暂无玩家记录。");
+            return;
+        }
+        List<String> uuids =
+                new ArrayList<>(data.getConfigurationSection(SECTION_PLAYERS).getKeys(false));
+        if (uuids.isEmpty()) {
+            sender.sendMessage(
+                    lang != null ? lang.getString("no-player-record", "§e暂无玩家记录。") : "§e暂无玩家记录。");
+            return;
+        }
+        int PAGE_SIZE = 10;
+        int page = 1;
+        if (args.length == 2 && args[1].matches("\\d+")) {
+            page = Integer.parseInt(args[1]);
+        }
+        List<String> pageList = CommandUtils.getPage(uuids, page, PAGE_SIZE);
+        int total = uuids.size();
+        int totalPages = Math.max(1, (int) Math.ceil(total * 1.0 / PAGE_SIZE));
+        if (page < 1)
+            page = 1;
+        if (page > totalPages)
+            page = totalPages;
+
+        String header =
+                lang != null
+                        ? lang.getString("page-header", "").replace("%page%", String.valueOf(page))
+                                .replace("%total%", String.valueOf(totalPages))
+                        : "";
+        sender.sendMessage(header);
+
+        if (sender instanceof Player) {
+            for (String uuid : pageList) {
+                String name = data.getString(SECTION_PLAYERS + "." + uuid + "." + FIELD_NAME, uuid);
+                String status =
+                        data.getString(SECTION_PLAYERS + "." + uuid + "." + FIELD_STATUS, "");
+                String json = CommandUtils.buildTellrawButton(name, status, uuid);
+                try {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                            "tellraw " + sender.getName() + " " + json);
+                } catch (Exception e) {
+                    sender.sendMessage((lang != null ? lang.getString("error-command", "") : "")
+                            + e.getMessage());
+                }
+            }
+        } else {
+            for (String uuid : pageList) {
+                String name = data.getString(SECTION_PLAYERS + "." + uuid + "." + FIELD_NAME, uuid);
+                sender.sendMessage(name);
+            }
+        }
+    }
+
+    /**
+     * 处理单玩家查询
+     */
+    private void handleCheckPlayer(@NotNull CommandSender sender, @NotNull String name,
+            @NotNull FileConfiguration data, @Nullable FileConfiguration lang,
+            @NotNull String pluginName) {
+        String uuid = getUUIDByName(data, name);
+        if (uuid == null) {
+            sender.sendMessage(lang != null ? lang.getString("player-not-found", "§c未找到该玩家记录。")
+                    : "§c未找到该玩家记录。");
+            return;
+        }
+        String status = data.getString(SECTION_PLAYERS + "." + uuid + "." + FIELD_STATUS, "");
+        String msg =
+                lang != null
+                        ? lang.getString("player-info", "").replace("%player%", name)
+                                .replace("%uuid%", uuid).replace("%status%", status)
+                        : "";
+        if (sender instanceof Player) {
+            String json = CommandUtils.buildTellrawButton(name, status, uuid);
+            try {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        "tellraw " + sender.getName() + " " + json);
+            } catch (Exception e) {
+                sender.sendMessage(
+                        (lang != null ? lang.getString("error-command", "") : "") + e.getMessage());
+            }
+        } else {
+            sender.sendMessage(msg.split("\\n"));
+        }
+    }
+
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias,
-            String[] args) {
-        // /lc <tab>
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+            @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
             return Arrays.asList("check", "reload");
         }
-        // /lc check <tab>
         if (args.length == 2 && args[0].equalsIgnoreCase("check")) {
-            List<String> names = new ArrayList<>();
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                names.add(player.getName());
+            FileConfiguration data = plugin.getPlayersData();
+            Set<String> names = new LinkedHashSet<>();
+            if (data.isConfigurationSection(SECTION_PLAYERS)) {
+                for (String uuid : data.getConfigurationSection(SECTION_PLAYERS).getKeys(false)) {
+                    String name =
+                            data.getString(SECTION_PLAYERS + "." + uuid + "." + FIELD_NAME, uuid);
+                    names.add(name);
+                }
             }
-            return names;
+            return new ArrayList<>(names);
         }
         return Collections.emptyList();
     }

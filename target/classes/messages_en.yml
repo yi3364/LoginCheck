@@ -1,0 +1,37 @@
+status-text-premium: "§b Premium "
+status-text-cracked: "§7 Cracked "
+
+broadcast-premium: "§aPlayer §6%player% §ahas logged in with %status%§a..."
+broadcast-cracked: "§aPlayer §6%player% §ahas logged in with %status%§a..."
+
+no-player-record: "§eNo player records found."
+usage-main: "§eUsage: /logincheck <check|reload>"
+usage-check: "§cUsage: /lc check [player|page]"
+usage-main2: "§cUsage: /lc [check <player>|reload]"
+no-permission: "§cYou do not have permission to do this."
+reload-success: "§aConfiguration reloaded successfully!"
+player-not-found: "§cNo record found for this player."
+page-header: "§aClick the player name below to quickly query (Page %page%/%total%):"
+player-info: "§ePlayer: §6%player%\n§eStatus: %status%\n§eUUID: §f%uuid%"
+error-command: "[LoginCheck] Command execution error: "
+error-nav: "§c[LoginCheck] Navigation button error: "
+error-broadcast: "[LoginCheck] Broadcast error: "
+error-save: "[LoginCheck] Player data save error: "
+
+welcome: "§aWelcome %player%!"
+plugin-enabled: "LoginCheck plugin enabled!"
+nav-prev: '{"text":"§b[Prev] ","clickEvent":{"action":"run_command","value":"/lc check %prev%"}}'
+nav-page: '{"text":"§7[Page %page%/%total%]"}'
+nav-next: '{"text":" §b[Next]","clickEvent":{"action":"run_command","value":"/lc check %next%"}}'
+player-tellraw-status: "{\"text\":\"\\n§eStatus: §f%status%\"}"
+player-tellraw-uuid: "{\"text\":\"\\n§eUUID: §f%uuid%\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"Click to copy UUID\"},\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"%uuid%\"}}"
+custom-welcome: "§aWelcome %player% to the server!"
+
+banner:
+  - "§b██╗      ██████╗  ██████╗ ██╗███╗   ██╗"
+  - "§b██║     ██╔═══██╗██╔════╝ ██║████╗  ██║"
+  - "§b██║     ██║   ██║██║  ███╗██║██╔██╗ ██║"
+  - "§b██║     ██║   ██║██║   ██║██║██║╚██╗██║"
+  - "§b███████╗╚██████╔╝╚██████╔╝██║██║ ╚████║"
+  - "§b╚══════╝ ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝"
+  - "§a[LoginCheck] plugin enabled!"
