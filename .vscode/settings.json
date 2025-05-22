@@ -15,5 +15,13 @@
         "**/target": true,
         "**/bin": true
     },
-    "yaml.schemaStore.enable": false
+    "yaml.schemaStore.enable": false,
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "pom.xml",
+                "cmd": "mvn clean package"
+            }
+        ]
+    }
 }
