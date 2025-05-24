@@ -1,4 +1,4 @@
-package com.afeng.logincheck;
+package com.afeng.logincheck.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

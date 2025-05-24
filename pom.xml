@@ -1,101 +1,119 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <!-- 项目基础信息 -->
-  <groupId>com.afeng.logincheck</groupId>
-  <artifactId>LoginCheck</artifactId>
-  <version>1.1.0</version>
-  <packaging>jar</packaging>
+    <!-- 项目基础信息 -->
+    <groupId>com.afeng.logincheck</groupId>
+    <artifactId>LoginCheck</artifactId>
+    <version>1.1.1</version>
+    <packaging>jar</packaging>
 
-  <name>LoginCheck</name>
-  <description>登录检查与假人权限分配插件</description>
-  <url>https://github.com/yi3364/LoginCheck</url>
+    <name>LoginCheck</name>
+    <description>自动识别正版/离线身份并执行权限分配和广播。</description>
+    <url>https://github.com/yi3364/LoginCheck</url>
 
-  <properties>
-    <!-- Minecraft 1.21.4 要求 Java 21 -->
-    <java.version>21</java.version>
-    <minecraft.version>1.21.4</minecraft.version>
-    <!-- 编码设置，防止中文乱码 -->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <!-- Minecraft 1.21.4 要求 Java 21 -->
+        <java.version>21</java.version>
+        <minecraft.version>1.21.4</minecraft.version>
+        <!-- 编码设置，防止中文乱码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <main.class>com.afeng.logincheck.LoginCheck</main.class>
+        <api.version>1.21</api.version>
+        <plugin.description>自动识别正版/离线身份并执行权限分配和广播。</plugin.description>
+    </properties>
 
-  <dependencies>
-    <!-- Paper API 依赖，编译时提供，不会打包进最终插件 -->
-    <dependency>
-      <groupId>io.papermc.paper</groupId>
-      <artifactId>paper-api</artifactId>
-      <version>${minecraft.version}-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- Spigot API 依赖 -->
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.20.4-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- LuckPerms 权限插件API（如有需要） -->
-    <!--
-    <dependency>
-      <groupId>net.luckperms</groupId>
-      <artifactId>api</artifactId>
-      <version>5.4</version>
-      <scope>provided</scope>
-    </dependency>
-    -->
-  </dependencies>
+    <!-- 添加 PaperMC 仓库，解决 bungeecord-chat/brigadier 依赖问题 -->
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
 
-  <repositories>
-    <!-- PaperMC 官方仓库 -->
-    <repository>
-      <id>papermc</id>
-      <url>https://repo.papermc.io/repository/maven-public/</url>
-    </repository>
-    <!-- PlaceholderAPI 仓库（如有需要可添加） -->
-    <!--
-    <repository>
-      <id>placeholderapi</id>
-      <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-    </repository>
-    -->
-  </repositories>
+    <dependencies>
+        <!-- PaperMC API 依赖 -->
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Adventure API（Paper 1.16+ 已内置，可选） -->
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.14.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 如需单独依赖 bungeecord-chat/brigadier，可添加如下（一般不需要，paper-api 已传递依赖） -->
+        <!--
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.20-R0.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.18</version>
+            <scope>provided</scope>
+        </dependency>
+        -->
+    </dependencies>
 
-  <build>
-    <plugins>
-      <!-- 编译插件，指定 Java 版本 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <compilerArgs>
-            <arg>-Xlint:-options</arg>
-          </compilerArgs>
-        </configuration>
-      </plugin>
-
-      <!-- 打包插件，生成可用的 jar 文件 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <!-- mainClass 对于插件不是必须，可移除 -->
-              <!-- <mainClass>com.afeng.logincheck.LoginCheck</mainClass> -->
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                    <include>messages_zh.yml</include>
+                    <include>messages_en.yml</include>
+                </includes>
+            </resource>
+            <!-- 其他资源文件不需要过滤，可单独配置 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                    <exclude>messages_zh.yml</exclude>
+                    <exclude>messages_en.yml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <!-- 编译插件，指定 Java 版本和警告屏蔽 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgs>
+                        <arg>-Xlint:-options</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <!-- 打包插件，生成可用的 jar 文件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

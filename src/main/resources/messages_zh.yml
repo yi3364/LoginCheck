@@ -1,32 +1,3 @@
-status-text-premium: "§b 正版 "
-status-text-cracked: "§7 LittleSkin皮肤站 "
-
-broadcast-premium: "§a玩家 §6%player% §a使用%status%§a登入服务器..."
-broadcast-cracked: "§a玩家 §6%player% §a使用%status%§a登入服务器..."
-
-no-player-record: "§e暂无玩家记录。"
-usage-main: "§e用法: /logincheck <check|reload>"
-usage-check: "§c用法: /lc check [玩家名|页码]"
-usage-main2: "§c用法: /lc [check <玩家名>|reload]"
-no-permission: "§c你没有权限执行此操作。"
-reload-success: "§a配置文件已重新加载！"
-player-not-found: "§c未找到该玩家记录。"
-page-header: "§a点击下方玩家名可快速查询（第 %page%/%total% 页）："
-player-info: "§e玩家: §6%player%\n§e身份: %status%\n§eUUID: §f%uuid%"
-error-command: "[LoginCheck] 命令执行异常："
-error-nav: "§c[LoginCheck] 翻页按钮异常："
-error-broadcast: "[LoginCheck] 广播消息异常："
-error-save: "[LoginCheck] 玩家数据保存异常："
-
-welcome: "§a欢迎 %player%！"
-plugin-enabled: "登录检查器插件已启用！"
-nav-prev: '{"text":"§b[上一页] ","clickEvent":{"action":"run_command","value":"/lc check %prev%"}}'
-nav-page: '{"text":"§7[第 %page%/%total% 页]"}'
-nav-next: '{"text":" §b[下一页]","clickEvent":{"action":"run_command","value":"/lc check %next%"}}'
-player-tellraw-status: "{\"text\":\"\\n§e身份: §f%status%\"}"
-player-tellraw-uuid: "{\"text\":\"\\n§eUUID: §f%uuid%\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"点击复制UUID\"},\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"%uuid%\"}}"
-custom-welcome: "§a欢迎 %player% 加入服务器！"
-
 banner:
   - "§b██╗      ██████╗  ██████╗ ██╗███╗   ██╗"
   - "§b██║     ██╔═══██╗██╔════╝ ██║████╗  ██║"
@@ -35,3 +6,17 @@ banner:
   - "§b███████╗╚██████╔╝╚██████╔╝██║██║ ╚████║"
   - "§b╚══════╝ ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝"
   - "§a[LoginCheck] 插件已启用！"
+broadcast-cracked: "§a玩家 §6%player% §a以%status%§a身份加入服务器！"
+broadcast-premium: "§a玩家 §6%player% §a以%status%§a身份加入服务器！"
+no-permission: "§c你没有权限执行此操作。"
+no-player-record: "§e暂无玩家记录。"
+page-header: "§a点击下方玩家名可快速查询（第 %page%/%total% 页）："
+player-info: "§e玩家: §6%player%\n§e身份: %status%\n§eUUID: §f%uuid%"
+player-not-found: "§c未找到该玩家记录。"
+prefix: "§7[§aLoginCheck§7] "
+reload-success: "§a配置文件已重新加载！"
+status-text-cracked: "§7 离线"
+status-text-premium: "§b 正版"
+usage-check: "§c用法: /lc check [玩家名|页码]"
+usage-main: "§e用法: /logincheck <check|reload>"
+usage-main2: "§c用法: /lc [check <玩家名>|reload]"

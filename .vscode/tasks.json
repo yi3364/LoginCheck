@@ -1,15 +1,15 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.0", // 任务配置文件的版本号
   "tasks": [
     {
-      "label": "Maven Package",
-      "type": "shell",
-      "command": "mvn clean package",
+      "label": "Maven Package", // 任务名称，会显示在任务列表中
+      "type": "shell",          // 任务类型，这里表示在 shell（终端）中运行
+      "command": "mvn clean package", // 实际要执行的命令
       "group": {
-        "kind": "build",
-        "isDefault": true
+        "kind": "build",        // 任务分组，属于“构建”任务
+        "isDefault": true       // 是否为默认构建任务（Ctrl+Shift+B 会直接运行）
       },
-      "problemMatcher": []
+      "problemMatcher": []      // 问题匹配器，这里为空，表示不自动解析输出为错误/警告
     }
   ]
 }
