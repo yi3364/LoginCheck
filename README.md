@@ -2,17 +2,17 @@
 
 # LoginCheck
 
-LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件，支持自动识别正版/离线玩家身份、识别后触发自定义命令实现如自动分配权限组等功能、进服消息广播、玩家信息查询等功能。
+LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件，支持自动识别正版/离线玩家身份，首次进服自动分配权限组，进服消息广播，玩家信息查询等功能。
 
 ---
 
 ## 功能特性
 
-- **自动识别正版/离线玩家**，首次进服玩家根据身份触发自定义命令实现自动分配不同权限组等功能
-- **进服消息自定义广播**
-- **记录玩家首次/最近登录时间、曾用名、UUID等**
-- **/lc check** 查询服务器曾经加入过的所有玩家
-- **配置灵活，支持自定义命令、消息、分组、数据文件名等**
+- **自动识别正版/离线玩家**，首次进服自动分配不同权限组
+- **自定义进服消息广播**
+- **记录玩家首次/最近登录、曾用名、UUID**
+- **/lc check** 查询服务器所有曾加入玩家
+- **灵活配置**：支持自定义命令、分组、数据文件名等
 
 ---
 
@@ -20,8 +20,7 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
 
 | 指令                        | 权限                | 说明                                 |
 |-----------------------------|---------------------|--------------------------------------|
-| /lc                         | -                   | 查询自己身份信息                     |
-| /lc check                   | logincheck.check    | 分页列出所有玩家，每行一个玩家       |
+| /lc check                   | logincheck.check    | 分页列出所有玩家                     |
 | /lc check <玩家名>          | logincheck.check    | 查询指定玩家详细信息                 |
 | /lc check <页码>            | logincheck.check    | 分页浏览玩家列表                     |
 | /lc reload                  | logincheck.reload   | 重载插件配置                         |
@@ -30,18 +29,17 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
 
 ## 配置说明
 
-- `config.yml` 功能开关、支持自定义分组、命令、消息等
-- `plugin.yml` 已声明所有命令与权限
+- `config.yml`：功能开关、自定义分组、命令等
+- `plugin.yml`：声明所有命令与权限
 
 ---
 
 ## 多语言与本地化
 
-- 所有消息、提示、错误、广播等均可在 `messages_zh.yml`、`messages_en.yml` 等文件中自定义。
-- `config.yml` 仅用于功能开关、分组、命令等配置，所有文本内容请在 lang 文件中维护。
+- 所有消息、提示、错误、广播等均可在 `messages_zh.yml`、`messages_en.yml` 等文件中自定义
+- `config.yml` 仅用于功能开关、分组、命令等配置，所有文本内容请在 lang 文件中维护
 
 ---
-
 
 ## 构建与安装
 

@@ -2,17 +2,17 @@
 
 # LoginCheck
 
-LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports automatic detection of premium/cracked player identities, triggers custom commands for automatic permission group assignment, broadcasts join messages, and provides player information query features.
+LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports automatic detection of premium/cracked player identities, automatic permission group assignment on first join, join message broadcast, and player information query.
 
 ---
 
 ## Features
 
-- **Automatic detection of premium/cracked players**: Assign different permission groups automatically based on player identity when they join for the first time.
+- **Automatic detection of premium/cracked players**: Assign different permission groups automatically on first join
 - **Customizable join message broadcast**
 - **Records first/recent login time, previous names, UUID, etc.**
 - **/lc check**: Query all players who have ever joined the server
-- **Flexible configuration**: Supports custom commands, messages, groups, data file names, and more
+- **Flexible configuration**: Supports custom commands, groups, data file names, etc.
 
 ---
 
@@ -20,8 +20,7 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
 
 | Command                      | Permission          | Description                                 |
 |------------------------------|---------------------|---------------------------------------------|
-| /lc                          | -                   | Show your own identity info                 |
-| /lc check                    | logincheck.check    | List all players (paginated, one per line)  |
+| /lc check                    | logincheck.check    | List all players (paginated)                |
 | /lc check <player>           | logincheck.check    | Show detailed info for the specified player |
 | /lc check <page>             | logincheck.check    | Browse player list by page                  |
 | /lc reload                   | logincheck.reload   | Reload plugin configuration                 |
@@ -30,7 +29,7 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
 
 ## Configuration
 
-- `config.yml`: Feature switches, custom groups, commands, messages, etc.
+- `config.yml`: Feature switches, custom groups, commands, etc.
 - `plugin.yml`: All commands and permissions are declared
 
 ---
