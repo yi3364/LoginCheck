@@ -1,4 +1,4 @@
-<!-- [English/中文] 切换: [English](README_en.md) | [中文](README.md) -->
+[English/中文] 切换: [English](README_en.md) | [中文](README.md)
 
 # LoginCheck
 
