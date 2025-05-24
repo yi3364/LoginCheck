@@ -1,7 +1,7 @@
 # LoginCheck 插件配置文件
 # 用于控制玩家首次加入时的权限分组、身份显示、消息文本等
 
-lang: zh_CN # 支持 zh_CN 或 en
+lang: zh # 支持 zh 或 en
 
 # === 功能开关 ===
 enable-commands:
