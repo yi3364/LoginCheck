@@ -1,4 +1,4 @@
-[English/中文] Switch: [English](README_en.md) | [中文](README.md)
+[English/简体中文] Switch: **[English]** | [简体中文](README.md)
 
 # LoginCheck
 
