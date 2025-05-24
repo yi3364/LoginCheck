@@ -1,4 +1,4 @@
-[English/简体中文] Switch: **[English]** | [简体中文](README.md)
+**Switch**: **English** | [简体中文](README.md)
 
 # LoginCheck
 
@@ -31,13 +31,6 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
 
 - `config.yml`: Feature switches, custom groups, commands, etc.
 - `plugin.yml`: All commands and permissions are declared
-
----
-
-## Localization
-
-- All messages, prompts, errors, and broadcasts can be customized in `messages_en.yml`, `messages_zh.yml`, etc.
-- `config.yml` is only for feature switches, groups, and commands. All text content should be maintained in lang files.
 
 ---
 

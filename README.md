@@ -1,4 +1,4 @@
-[English/简体中文] 切换: [English](README_en.md) | **[简体中文]**
+**切换**: [English](README_en.md) | **简体中文**
 
 # LoginCheck
 
@@ -34,12 +34,6 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
 
 ---
 
-## 多语言与本地化
-
-- 所有消息、提示、错误、广播等均可在 `messages_zh.yml`、`messages_en.yml` 等文件中自定义
-- `config.yml` 仅用于功能开关、分组、命令等配置，所有文本内容请在 lang 文件中维护
-
----
 
 ## 构建与安装
 
