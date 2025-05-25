@@ -41,7 +41,7 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
    ```shell
    mvn clean package
    ```
-2. Put `target/LoginCheck-x.x.x.jar` into your server's `plugins` directory
+2. Put `target/LoginCheck-${project.version}.jar` into your server's `plugins` directory
 3. Start the server to auto-generate config files
 
 ---

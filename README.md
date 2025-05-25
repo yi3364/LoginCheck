@@ -41,7 +41,7 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
    ```shell
    mvn clean package
    ```
-2. 将 `target/LoginCheck-x.x.x.jar` 放入服务器 `plugins` 目录
+2. 将 `target/LoginCheck-${project.version}.jar` 放入服务器 `plugins` 目录
 3. 启动服务器，自动生成配置文件
 
 ---
