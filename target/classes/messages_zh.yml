@@ -14,6 +14,8 @@ page-header: "§a点击下方玩家名可快速查询（第 %page%/%total% 页�
 player-info: "§e玩家: §6%player%\n§e身份: %status%\n§eUUID: §f%uuid%"
 player-not-found: "§c未找到该玩家记录。"
 prefix: "§7[§aLoginCheck§7] "
+prev-page: "§b[上一页]"
+next-page: "§b[下一页]"
 reload-success: "§a配置文件已重新加载！"
 status-text-cracked: "§7 离线"
 status-text-premium: "§b 正版"

@@ -14,6 +14,8 @@ page-header: "§aClick the player name below to quickly query (Page %page%/%tota
 player-info: "§ePlayer: §6%player%\n§eStatus: %status%\n§eUUID: §f%uuid%"
 player-not-found: "§cNo record found for this player."
 prefix: "§7[§aLoginCheck§7] "
+prev-page: "§b[Prev Page]"
+next-page: "§b[Next Page]"
 reload-success: "§aConfiguration reloaded successfully!"
 status-text-cracked: "§7 Cracked"
 status-text-premium: "§b Premium"

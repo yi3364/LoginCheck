@@ -1,13 +1,22 @@
 {
+    // Java 空值分析模式自动
     "java.compile.nullAnalysis.mode": "automatic",
+    // Java 代码格式化风格（Google Java Style）
     "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
     "java.format.settings.profile": "GoogleStyle",
+    // 自动更新 Java 构建配置
     "java.configuration.updateBuildConfiguration": "automatic",
+    // Java 类路径不完整时仅警告
     "java.errors.incompleteClasspath.severity": "warning",
+    // 显示代码引用 CodeLens
     "java.referencesCodeLens.enabled": true,
+    // 显示实现 CodeLens
     "java.implementationsCodeLens.enabled": true,
+    // 保存时自动格式化
     "editor.formatOnSave": true,
+    // 文件自动保存（延迟后）
     "files.autoSave": "afterDelay",
+    // 排除不需要的文件和文件夹
     "files.exclude": {
         "**/.classpath": true,
         "**/.project": true,
@@ -15,7 +24,9 @@
         "**/target": true,
         "**/bin": true
     },
+    // 禁用 YAML schema store 自动更新
     "yaml.schemaStore.enable": false,
+    // 保存 pom.xml 时自动执行 mvn clean package
     "emeraldwalk.runonsave": {
         "commands": [
             {
