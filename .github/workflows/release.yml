@@ -24,20 +24,19 @@ jobs:
 
       - name: 构建插件
         run: mvn clean package    # 使用 Maven 构建项目
-
+        
       - name: 读取更新日志
         id: changelog
         run: |
-          # 提取 CHANGELOG.md 中最新一版的内容作为 Release 描述
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          awk '/^## /{if (p) exit; p=1; next} p' CHANGELOG.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+          awk '/^## /{if (p) exit; p=1; next} p' CHANGELOG.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: 上传 Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/*.jar          # 上传构建产物
-          body: ${{ steps.changelog.outputs.body }} # Release 描述为 changelog
+            target/*.jar
+          body: ${{ env.RELEASE_BODY }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于认证发布 Release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
