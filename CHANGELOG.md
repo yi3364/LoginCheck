@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## V1.1.4
+- 新增：拥有 `logincheck.vanish` 权限的玩家将完全隐身，不显示在服务器 MOTD、Tab 列表、命令补全等所有玩家列表中
+- 优化：Vanish 功能兼容 Paper 新版 MOTD 玩家列表协议
+- 修复：部分场景下隐身玩家仍可被 Tab 补全的问题
+
 ## V1.1.3
 - 新增：拥有 `logincheck.silentjoin` 权限的玩家上线时不再广播进服消息，且不执行任何进服相关处理
 - 优化：silent join 权限判断提前，确保静默玩家完全不参与数据与消息逻辑

@@ -2,4 +2,5 @@ D:\AGOD\MinecraftPlugins\LoginCheck\src\main\java\com\afeng\logincheck\LoginChec
 D:\AGOD\MinecraftPlugins\LoginCheck\src\main\java\com\afeng\logincheck\command\LoginCheckCommand.java
 D:\AGOD\MinecraftPlugins\LoginCheck\src\main\java\com\afeng\logincheck\util\PlayerDataManager.java
 D:\AGOD\MinecraftPlugins\LoginCheck\src\main\java\com\afeng\logincheck\listener\PlayerJoinListener.java
+D:\AGOD\MinecraftPlugins\LoginCheck\src\main\java\com\afeng\logincheck\listener\VanishListener.java
 D:\AGOD\MinecraftPlugins\LoginCheck\src\main\java\com\afeng\logincheck\util\PlaceholderUtils.java

@@ -34,6 +34,7 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
 | logincheck.check        | Allow using /lc check to query player info                                  |
 | logincheck.reload       | Allow reloading plugin configuration                                        |
 | logincheck.silentjoin   | Players with this permission will not trigger join messages or any join logic |
+| logincheck.vanish       | Players with this permission will be completely vanished: not shown in server MOTD, tab list, or command tab-complete |
 
 ---
 
