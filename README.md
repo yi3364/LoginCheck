@@ -18,12 +18,22 @@ LoginCheck 是一款适用于 Paper/Spigot/Leaves 服务器的 Minecraft 插件�
 
 ## 指令说明
 
-| 指令                        | 权限                | 说明                                 |
-|-----------------------------|---------------------|--------------------------------------|
-| /lc check                   | logincheck.check    | 分页列出所有玩家                     |
-| /lc check <玩家名>          | logincheck.check    | 查询指定玩家详细信息                 |
-| /lc check <页码>            | logincheck.check    | 分页浏览玩家列表                     |
-| /lc reload                  | logincheck.reload   | 重载插件配置                         |
+| 指令                        | 权限节点                | 说明                                 |
+|-----------------------------|-------------------------|--------------------------------------|
+| /lc check                   | logincheck.check        | 分页列出所有玩家                     |
+| /lc check <玩家名>          | logincheck.check        | 查询指定玩家详细信息                 |
+| /lc check <页码>            | logincheck.check        | 分页浏览玩家列表                     |
+| /lc reload                  | logincheck.reload       | 重载插件配置                         |
+
+---
+
+## 权限节点说明
+
+| 权限节点                  | 作用说明                                   |
+|---------------------------|--------------------------------------------|
+| logincheck.check          | 允许使用 /lc check 查询玩家信息            |
+| logincheck.reload         | 允许重载插件配置                           |
+| logincheck.silentjoin     | 拥有该权限的玩家上线时不会广播进服消息，且不执行任何进服相关处理 |
 
 ---
 

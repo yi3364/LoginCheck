@@ -18,12 +18,22 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
 
 ## Command Reference
 
-| Command                      | Permission          | Description                                 |
-|------------------------------|---------------------|---------------------------------------------|
-| /lc check                    | logincheck.check    | List all players (paginated)                |
-| /lc check <player>           | logincheck.check    | Show detailed info for the specified player |
-| /lc check <page>             | logincheck.check    | Browse player list by page                  |
-| /lc reload                   | logincheck.reload   | Reload plugin configuration                 |
+| Command                      | Permission              | Description                                 |
+|------------------------------|-------------------------|---------------------------------------------|
+| /lc check                    | logincheck.check        | List all players (paginated)                |
+| /lc check <player>           | logincheck.check        | Show detailed info for the specified player |
+| /lc check <page>             | logincheck.check        | Browse player list by page                  |
+| /lc reload                   | logincheck.reload       | Reload plugin configuration                 |
+
+---
+
+## Permission Nodes
+
+| Permission              | Description                                                                 |
+|-------------------------|-----------------------------------------------------------------------------|
+| logincheck.check        | Allow using /lc check to query player info                                  |
+| logincheck.reload       | Allow reloading plugin configuration                                        |
+| logincheck.silentjoin   | Players with this permission will not trigger join messages or any join logic |
 
 ---
 
@@ -33,7 +43,6 @@ LoginCheck is a Minecraft plugin for Paper/Spigot/Leaves servers. It supports au
 - `plugin.yml`: All commands and permissions are declared
 
 ---
-
 
 ## Build & Install
 

@@ -23,13 +23,16 @@ public class PlayerJoinListener implements Listener {
         this.plugin = plugin;
     }
 
-    private String replacePlaceholders(String msg, String player, String uuid, String status, String pluginName) {
-        return msg.replace("%player%", player).replace("%uuid%", uuid).replace("%status%", status).replace("%plugin%", pluginName);
-    }
-
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        // 拥有 logincheck.silentjoin 权限的玩家上线不广播，且不执行后续逻辑
+        if (player.hasPermission("logincheck.silentjoin")) {
+            event.setJoinMessage(null);
+            return;
+        }
+
         String name = player.getName();
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
@@ -48,7 +51,8 @@ public class PlayerJoinListener implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             boolean isPremium = false;
             try {
-                String urlStr = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "");
+                String urlStr = "https://sessionserver.mojang.com/session/minecraft/profile/"
+                        + uuid.toString().replace("-", "");
                 URL url = java.net.URI.create(urlStr).toURL();
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
@@ -66,7 +70,8 @@ public class PlayerJoinListener implements Listener {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 playersData.set(path + ".name", name);
                 String statusKey = finalIsPremium ? "status-text-premium" : "status-text-cracked";
-                String statusText = plugin.getMessages().getString(statusKey, finalIsPremium ? "正版" : "离线");
+                String statusText =
+                        plugin.getMessages().getString(statusKey, finalIsPremium ? "正版" : "离线");
                 playersData.set(path + ".status", statusText);
                 playersData.set(path + ".last-login", nowStr);
                 if (isFirstJoin) {
@@ -92,19 +97,27 @@ public class PlayerJoinListener implements Listener {
 
                 // 广播消息（无论正版/盗版都广播）
                 if (config.getBoolean("broadcast-enabled", true)) {
-                    String broadcastMsgKey = finalIsPremium ? "broadcast-premium" : "broadcast-cracked";
-                    String msg = plugin.getMessages().getString(broadcastMsgKey, "玩家 %player% 上线，身份：%status%");
-                    msg = msg.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%status%", statusText).replace("%plugin%", pluginName);
-                    Bukkit.broadcastMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', plugin.getMessages().getString("prefix", "") + msg));
+                    String broadcastMsgKey =
+                            finalIsPremium ? "broadcast-premium" : "broadcast-cracked";
+                    String msg = plugin.getMessages().getString(broadcastMsgKey,
+                            "玩家 %player% 上线，身份：%status%");
+                    msg = msg.replace("%player%", name).replace("%uuid%", uuid.toString())
+                            .replace("%status%", statusText).replace("%plugin%", pluginName);
+                    Bukkit.broadcastMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&',
+                            plugin.getMessages().getString("prefix", "") + msg));
                 }
 
                 // 首次加入执行命令
                 if (isFirstJoin) {
                     String cmdKey = finalIsPremium ? "commands.premium" : "commands.cracked";
-                    if (config.getBoolean("enable-commands." + (finalIsPremium ? "premium" : "cracked"), true)) {
+                    if (config.getBoolean(
+                            "enable-commands." + (finalIsPremium ? "premium" : "cracked"), true)) {
                         String command = config.getString(cmdKey, null);
                         if (command != null && !command.isEmpty()) {
-                            command = command.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%status%", statusText).replace("%plugin%", pluginName);
+                            command = command.replace("%player%", name)
+                                    .replace("%uuid%", uuid.toString())
+                                    .replace("%status%", statusText)
+                                    .replace("%plugin%", pluginName);
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                         }
                     }
